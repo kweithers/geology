@@ -42,4 +42,30 @@ for image_batch, labels_batch in train_ds:
   break
 
 from tensorflow.keras import layers
-normalization_layer = tf.keras.layers.experimental.preprocessing.Rescaling(1./255)
+
+num_classes = 6
+
+model = tf.keras.Sequential([
+  layers.experimental.preprocessing.Rescaling(1./255),
+  layers.Conv2D(32, 3, activation='relu'),
+  layers.MaxPooling2D(),
+  layers.Conv2D(32, 3, activation='relu'),
+  layers.MaxPooling2D(),
+  layers.Conv2D(32, 3, activation='relu'),
+  layers.MaxPooling2D(),
+  layers.Flatten(),
+  layers.Dense(128, activation='relu'),
+  layers.Dense(num_classes)
+])
+
+model.compile(
+  optimizer='adam',
+  loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True),
+  metrics=['accuracy'])
+
+model.fit(
+  train_ds,
+  validation_data=val_ds,
+  epochs=3
+)
+
