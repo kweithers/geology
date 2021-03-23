@@ -131,7 +131,7 @@ feature_vectors = feature_model.predict(image_data[0])
 mapped_classes = list(map(lambda x: class_names[x], classes[0]))
 
 #Take a sample query vector
-image_id = 787
+image_id = 42
 query_vector = feature_vectors[image_id]
 query_image = image_data[0][image_id]
 query_class = mapped_classes[image_id]
@@ -146,12 +146,12 @@ for i in range(len(distances)):
 #Exclude the query image 
 distances[image_id] = np.float('inf')
 
-k=5
+k=8
 matches = np.argpartition(distances, k)[:k]
 
 # Plot the query image and its closest matches
 plt.figure(figsize=(10, 10))
-for i in range(6):
+for i in range(9):
   if i == 0:
       ax = plt.subplot(3,3, i+1)
       plt.imshow(query_image.astype("uint8"))

@@ -48,3 +48,14 @@ I compute the feature vector for every image in our dataset. Then, when presente
 
 Now, given any query image, it returns the query image and the k most similar images and plots them.
 
+Here are some example outputs: The query image is in the top left, with the most similar 8 images also shown.
+
+![]("similar4.png")
+
+![]("similar3.png")
+
+![]("similar5.png")
+
+![]("similar2.png")
+
+![]("similar1.png")
