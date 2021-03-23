@@ -11,7 +11,7 @@ img_width = 28
 
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   '/Users/kevinweithers/Documents/miscProjects/Geology/geological_similarity',
-  validation_split=0.1,
+  validation_split=0.2,
   subset="training",
   seed=123,
   image_size=(img_height, img_width),
@@ -20,7 +20,7 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
 
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   '/Users/kevinweithers/Documents/miscProjects/Geology/geological_similarity',
-  validation_split=0.1,
+  validation_split=0.2,
   subset="validation",
   seed=123,
   image_size=(img_height, img_width),
@@ -32,11 +32,12 @@ class_names = train_ds.class_names
 
 plt.figure(figsize=(10, 10))
 for images, labels in train_ds.take(1):
-  for i in range(9):
-    ax = plt.subplot(3, 3, i + 1)
+  for i in range(16):
+    ax = plt.subplot(4,4, i + 1)
     plt.imshow(images[i].numpy().astype("uint8"))
     plt.title(class_names[labels[i]])
     plt.axis("off")
+
 
 ### Setup a simple classification model 
 
@@ -66,7 +67,7 @@ model.fit(train_ds,
 ### Remove the final dense softmax layer so we can output a feature representation
 model2 = tf.keras.Model(model.input,model.layers[5].output)
 
-#Get validation data all in one batch for plotting
+#Get some validation data for plotting
 all_validation = tf.keras.preprocessing.image_dataset_from_directory(
   '/Users/kevinweithers/Documents/miscProjects/Geology/geological_similarity',
   validation_split=0.1,
@@ -93,8 +94,8 @@ svd.fit(embedded_data)
 
 #Plot a few to see if the classes are separated reasonably
 images_svd = svd.transform(embedded_data)
-x = [x[1] for x in images_svd]
-y = [x[2] for x in images_svd]
+x = [x[0] for x in images_svd]
+y = [x[1] for x in images_svd]
 
 fig, ax = plt.subplots()
 scatter_x = np.array(x)
