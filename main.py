@@ -65,10 +65,10 @@ model.fit(train_ds,
 )
 
 ### Remove the final dense softmax layer so we can output a feature representation
-model2 = tf.keras.Model(model.input,model.layers[5].output)
+feature_model = tf.keras.Model(model.input,model.layers[5].output)
 
 #Get some validation data for plotting
-all_validation = tf.keras.preprocessing.image_dataset_from_directory(
+plotting_data = tf.keras.preprocessing.image_dataset_from_directory(
   '/Users/kevinweithers/Documents/miscProjects/Geology/geological_similarity',
   validation_split=0.1,
   subset="validation",
@@ -76,13 +76,13 @@ all_validation = tf.keras.preprocessing.image_dataset_from_directory(
   image_size=(img_height, img_width),
   batch_size=2999)
 
-data = all_validation.as_numpy_iterator()
+data = plotting_data.as_numpy_iterator()
 batches = [x for x in data]
 image_data = [x[0] for x in batches]
 classes = [x[1] for x in batches]
 
-#Get the encoded representations
-embedded_data = model2.predict(image_data[0])
+#Get the feature representations
+features = feature_model.predict(image_data[0])
 
 #Map the integers to the proper class name
 mapped_classes = list(map(lambda x: class_names[x], classes[0]))
@@ -90,10 +90,10 @@ mapped_classes = list(map(lambda x: class_names[x], classes[0]))
 ### Dimensionality Reduction so we can plot
 from sklearn.decomposition import TruncatedSVD
 svd = TruncatedSVD(n_components=20,random_state=42)
-svd.fit(embedded_data)
+svd.fit(features)
 
 #Plot a few to see if the classes are separated reasonably
-images_svd = svd.transform(embedded_data)
+images_svd = svd.transform(features)
 x = [x[0] for x in images_svd]
 y = [x[1] for x in images_svd]
 
@@ -107,3 +107,78 @@ for g in np.unique(group):
 ax.legend()
 plt.title("2D Dimensionality Reduction of Rock Features from NN")
 plt.show()
+
+# Looks good - Now we have a 64 dimensinoal vector representing each image
+# The distance between two vectors represents image similarity!
+# We can calculate and cache these vectors for every image, then
+# do a lookup for the closest k images when we are presented with a query image
+
+one_batch = tf.keras.preprocessing.image_dataset_from_directory(
+  '/Users/kevinweithers/Documents/miscProjects/Geology/geological_similarity',
+  validation_split=0.2,
+  subset="training",
+  seed=123,
+  image_size=(img_height, img_width),
+  batch_size=29998)
+
+data = one_batch.as_numpy_iterator()
+batches = [x for x in data]
+image_data = [x[0] for x in batches]
+classes = [x[1] for x in batches]
+
+#Calculcate feature vectors for every image
+feature_vectors = feature_model.predict(image_data[0])
+mapped_classes = list(map(lambda x: class_names[x], classes[0]))
+
+#Take a sample query vector
+image_id = 787
+query_vector = feature_vectors[image_id]
+query_image = image_data[0][image_id]
+query_class = mapped_classes[image_id]
+
+#Initialize distance vector
+distances = np.zeros(29998)
+
+#Calculate distances
+for i in range(len(distances)):
+    distances[i] = np.linalg.norm(query_vector - feature_vectors[i])
+
+#Exclude the query image 
+distances[image_id] = np.float('inf')
+
+k=5
+matches = np.argpartition(distances, k)[:k]
+
+# Plot the query image and its closest matches
+plt.figure(figsize=(10, 10))
+for i in range(6):
+  if i == 0:
+      ax = plt.subplot(3,3, i+1)
+      plt.imshow(query_image.astype("uint8"))
+      plt.title(query_class)
+      plt.axis("off")
+  else:
+      ax = plt.subplot(3,3,i+1)
+      plt.imshow(image_data[0][matches[i-1]].astype("uint8"))
+      plt.title(mapped_classes[matches[i-1]])
+      plt.axis("off")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
