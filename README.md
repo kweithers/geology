@@ -4,7 +4,7 @@
 
 ## Overview 
 
-This repository allows users to search for similar geological images given a query image. It trains a neural network to classify our training data into one of the six classes. Then, it removes the final layer of the neural network such that we have a sub-model that outputs a feature vector that represents an image. The similarity of two images is represented by the distance between their feature vectors.
+This repository allows users to search for similar geological images given a query image. It trains a neural network to classify our training data into one of the six classes. Then, it removes the final layer of the neural network such that we have a sub-model that outputs a feature vector that represents an image. The similarity of two images is represented by the Euclidean distance between their feature vectors.
 
 Now, for any query image, we can run it through the model to create its feature vector, and return the k most similar images by comparing its feature vector to all of the other feature vectors in the dataset.
 
@@ -36,7 +36,7 @@ This dataset is rather small, but if I were working with something much larger, 
 
 ### Feature Extractor
 
-Now that we have our trained model, we can remove the final layer and use this submodel that outputs a 64 dimensional feature vector. I like to visualize the results in order to confirm that the feature vector is meaningful, so I applied Singular Value Decomposition to our validation data and then plotted the first 2 components.
+Now that we have our trained model, we can remove the final layer and use this submodel that outputs a 64 dimensional feature vector. I like to visualize the results in order to confirm that the feature vector is meaningful, so I applied Singular Value Decomposition to our validation data feature vectors and then plotted the first 2 components.
 
 ![]("2dFeatures.png")
 
@@ -44,11 +44,11 @@ The classes are well separated, so this confirms that our feature vector gives a
 
 ### Generate k Most Similar Images for a Query Image
 
-I compute the feature vector for every image in our dataset. Then, when presented with a query image, I compute its feature vector. It calculates the distance between this new vector and every other feature vector in our dataset. Since we only need the top k matches, we don't need to sort all of the distances, we can use a partition algorithm like np.argpartition that has better asymptotic time complexity. (Not impactful in this case since our dataset is small, but impactful if working with a huge dataset.)
+I compute the feature vector for every image in our dataset. Then, when presented with a query image, I compute its feature vector. Next, I calculate the distance between this new vector and every other feature vector in our dataset. Since we only need the top k matches, we don't need to sort all of the distances, we can use a partition algorithm like np.argpartition that has better asymptotic time complexity. (Not impactful in this case since our dataset is small, but impactful if working with a huge dataset.)
 
 Now, given any query image, it returns the query image and the k most similar images and plots them.
 
-Here are some example outputs: The query image is in the top left, with the most similar 8 images also shown.
+Here are some example outputs: The query image is in the top left, shown with the 8 most similar images (in no particular order).
 
 ![]("similar4.png")
 
