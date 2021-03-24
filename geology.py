@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 import matplotlib.pyplot as plt
 
-### Read in our data
+### Set up the data
 
 batch_size = 32
 img_height = 28
@@ -39,7 +39,7 @@ for images, labels in train_ds.take(1):
     plt.axis("off")
 
 
-### Setup a simple classification model 
+### Set up a simple classification model 
 
 model = tf.keras.Sequential([
   layers.experimental.preprocessing.Rescaling(1./255),
@@ -64,7 +64,7 @@ model.fit(train_ds,
   callbacks=[early_stop]
 )
 
-### Remove the final dense softmax layer so we can output a feature representation
+### Remove the final dense softmax layer so it can output a feature representation
 feature_model = tf.keras.Model(model.input,model.layers[5].output)
 
 #Get some validation data for plotting
@@ -87,7 +87,7 @@ features = feature_model.predict(image_data[0])
 #Map the integers to the proper class name
 mapped_classes = list(map(lambda x: class_names[x], classes[0]))
 
-### Dimensionality Reduction so we can plot
+### Dimensionality Reduction for plotting
 from sklearn.decomposition import TruncatedSVD
 svd = TruncatedSVD(n_components=20,random_state=42)
 svd.fit(features)
@@ -108,10 +108,10 @@ ax.legend()
 plt.title("2D Dimensionality Reduction of Rock Features from NN")
 plt.show()
 
-# Looks good - Now we have a 64 dimensinoal vector representing each image
+# Looks good - Now I have a 64 dimensional vector representing each image
 # The distance between two vectors represents image similarity!
-# We can calculate and cache these vectors for every image, then
-# do a lookup for the closest k images when we are presented with a query image
+# I can calculate and cache these vectors for every image, then
+# do a lookup for the closest k images when I am presented with a query image
 
 one_batch = tf.keras.preprocessing.image_dataset_from_directory(
   '/Users/kevinweithers/Documents/miscProjects/Geology/geological_similarity',
@@ -143,9 +143,10 @@ distances = np.zeros(29998)
 for i in range(len(distances)):
     distances[i] = np.linalg.norm(query_vector - feature_vectors[i])
 
-#Exclude the query image 
+#Exclude the query image itself by setting its distance to infinity
 distances[image_id] = np.float('inf')
 
+#Find the k closest images
 k=8
 matches = np.argpartition(distances, k)[:k]
 
@@ -162,23 +163,3 @@ for i in range(9):
       plt.imshow(image_data[0][matches[i-1]].astype("uint8"))
       plt.title(mapped_classes[matches[i-1]])
       plt.axis("off")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
