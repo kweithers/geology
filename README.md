@@ -10,7 +10,7 @@ Now, for any query image, I can run it through the sub-model to create its featu
 
 ### First Look at the Data
 
-![]("samples.png")
+![](samples.png)
 
 There are clear similarities among samples of the same class, and clear differences between samples of different classes. If I train a model to classify these images into their classes, the model will learn the most salient features that describe an image. I will use these features as a measure of image similarity.
 
@@ -38,7 +38,7 @@ This dataset is rather small, but if I were working with something much larger, 
 
 Now that I have the trained model, I remove the final layer and use this sub-model that outputs a 64 dimensional feature vector. I like to visualize the results in order to confirm that the feature vector is meaningful, so I applied Singular Value Decomposition to the validation data feature vectors and then plotted the first 2 components.
 
-![]("2dFeatures.png")
+![](2dFeatures.png)
 
 The classes are well separated, so this confirms that the feature vector gives a meaningful representation of an image. I am confident that the distance between the feature vectors of 2 images is a good measure of their similarity.
 
@@ -50,12 +50,12 @@ Now, given any query image, it returns the query image and the k most similar im
 
 Here are some example outputs: The query image is in the top left, shown with the 8 most similar images (in no particular order).
 
-![]("similar4.png")
+![](similar4.png)
 
-![]("similar3.png")
+![](similar3.png)
 
-![]("similar5.png")
+![](similar5.png)
 
-![]("similar2.png")
+![](similar2.png)
 
-![]("similar1.png")
+![](similar1.png)
